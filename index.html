@@ -1,1 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autorização Mercado Livre</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f4f7;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    padding: 20px;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    padding: 32px 36px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+  }
+  h1 {
+    font-size: 18px;
+    color: #2D3277;
+    margin: 0 0 4px 0;
+  }
+  .sub {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 22px;
+  }
+  .rotulo {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 6px;
+  }
+  .codigo-box {
+    background: #f0f0f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 14px;
+    word-break: break-all;
+    margin-bottom: 14px;
+    min-height: 20px;
+  }
+  button {
+    background: #FFE600;
+    color: #2D3277;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { background: #ffd500; }
+  button:disabled { background: #ddd; color: #999; cursor: default; }
+  .vazio {
+    color: #999;
+    font-size: 14px;
+    padding: 10px 0;
+  }
+  .erro-box {
+    background: #FDEDEC;
+    border: 1px solid #F1C0C0;
+    border-radius: 6px;
+    padding: 14px 16px;
+    color: #B03A2E;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
 
+<div class="card">
+  <h1>Autorização Mercado Livre</h1>
+  <div class="sub">Página de retorno (Redirect URI) da integração do Varejo</div>
+
+  <div id="conteudo">
+    <div class="vazio">Aguardando retorno da autorização...</div>
+  </div>
+</div>
+
+<script>
+  var params = new URLSearchParams(window.location.search);
+  var code = params.get("code");
+  var erro = params.get("error");
+  var erroDesc = params.get("error_description");
+  var destino = document.getElementById("conteudo");
+
+  function escapeHtml(texto) {
+    var div = document.createElement("div");
+    div.textContent = texto;
+    return div.innerHTML;
+  }
+
+  if (code) {
+    destino.innerHTML =
+      '<div class="rotulo">Código de autorização</div>' +
+      '<div class="codigo-box" id="codigoTexto">' + escapeHtml(code) + '</div>' +
+      '<button id="btnCopiar">Copiar código</button>';
+
+    document.getElementById("btnCopiar").addEventListener("click", function () {
+      navigator.clipboard.writeText(code).then(function () {
+        var btn = document.getElementById("btnCopiar");
+        btn.textContent = "Copiado!";
+        btn.disabled = true;
+      });
+    });
+  } else if (erro) {
+    destino.innerHTML =
+      '<div class="erro-box"><b>Autorização recusada ou falhou.</b><br>' +
+      escapeHtml(erro) + (erroDesc ? ' — ' + escapeHtml(erroDesc) : '') +
+      '</div>';
+  } else {
+    destino.innerHTML = '<div class="vazio">Nenhum código recebido nesta URL. Esta página só é útil quando acessada via redirecionamento do Mercado Livre.</div>';
+  }
+</script>
+
+</body>
+</html>
